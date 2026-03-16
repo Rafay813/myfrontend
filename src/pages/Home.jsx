@@ -10,7 +10,7 @@ import Badge from '../components/ui/Badge'
 const stats = [
   { label: 'Files Transferred', value: '10K+' },
   { label: 'Hosting Services', value: '2' },
-  { label: 'Max File Size', value: '500MB' },
+  { label: 'Max File Size', value: 'Any Size' },
   { label: 'Uptime', value: '99.9%' },
 ]
 
