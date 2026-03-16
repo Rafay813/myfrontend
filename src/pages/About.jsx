@@ -27,7 +27,7 @@ const values = [
 
 const limitations = [
   { text: 'Files must be set to public on Google Drive', icon: '⚠️' },
-  { text: 'Maximum file size: 500MB per transfer', icon: '📦' },
+  { text: 'Maximum file size: of any size per transfer', icon: '📦' },
   { text: 'Gofile links expire after 10 days of inactivity', icon: '⏰' },
   { text: 'PixelDrain free tier: 20GB/month bandwidth', icon: '📊' },
 ]

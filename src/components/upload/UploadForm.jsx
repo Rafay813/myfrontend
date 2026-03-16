@@ -5,17 +5,26 @@ const UploadForm = ({ onSubmit, loading }) => {
   const [link, setLink] = useState('')
   const [touched, setTouched] = useState(false)
 
-  const isValidDriveLink = (url) => {
-    return url.startsWith('https://drive.google.com') ||
-           url.startsWith('https://docs.google.com')
+  const isValidLink = (url) => {
+    return url.startsWith('http://') || url.startsWith('https://')
   }
 
-  const hasError = touched && link && !isValidDriveLink(link)
+  const getSourceLabel = (url) => {
+    if (url.includes('drive.google.com')) return '🟢 Google Drive'
+    if (url.includes('dropbox.com')) return '🔵 Dropbox'
+    if (url.includes('onedrive.live.com') || url.includes('1drv.ms')) return '🔷 OneDrive'
+    if (url.includes('mediafire.com')) return '🟠 MediaFire'
+    if (isValidLink(url)) return '🔗 Direct Link'
+    return null
+  }
+
+  const hasError = touched && link && !isValidLink(link)
+  const sourceLabel = link && isValidLink(link) ? getSourceLabel(link) : null
 
   const handleSubmit = (e) => {
     e.preventDefault()
     setTouched(true)
-    if (!link.trim() || !isValidDriveLink(link)) return
+    if (!link.trim() || !isValidLink(link)) return
     onSubmit(link.trim())
   }
 
@@ -33,18 +42,19 @@ const UploadForm = ({ onSubmit, loading }) => {
     <form onSubmit={handleSubmit} className="w-full space-y-4">
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-400">
-          Google Drive Link
+          Download Link
         </label>
 
         {/* Input Row */}
         <div className={`flex items-center gap-2 p-1.5 rounded-2xl border transition-all duration-200 bg-white/5 backdrop-blur-sm ${
           hasError
-            ? 'border-red-500/50 shadow-red-500/10 shadow-lg'
-            : link && isValidDriveLink(link)
-            ? 'border-green-500/50 shadow-green-500/10 shadow-lg'
-            : 'border-white/10 focus-within:border-violet-500/50 focus-within:shadow-violet-500/10 focus-within:shadow-lg'
+            ? 'border-red-500/50'
+            : link && isValidLink(link)
+            ? 'border-green-500/50'
+            : 'border-white/10 focus-within:border-violet-500/50'
         }`}>
-          {/* Drive Icon */}
+
+          {/* Link Icon */}
           <div className="pl-3 flex-shrink-0">
             <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
@@ -58,7 +68,7 @@ const UploadForm = ({ onSubmit, loading }) => {
             value={link}
             onChange={(e) => { setLink(e.target.value); setTouched(false) }}
             onBlur={() => setTouched(true)}
-            placeholder="https://drive.google.com/file/d/..."
+            placeholder="Paste any download link — Google Drive, Dropbox, OneDrive..."
             disabled={loading}
             className="flex-1 bg-transparent py-3 px-2 text-white placeholder-gray-600 text-sm outline-none disabled:opacity-50"
           />
@@ -88,26 +98,38 @@ const UploadForm = ({ onSubmit, loading }) => {
           )}
         </div>
 
-        {/* Validation Message */}
+        {/* Error Message */}
         {hasError && (
           <p className="text-red-400 text-xs flex items-center gap-1.5">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Please enter a valid Google Drive link
+            Please enter a valid URL starting with http:// or https://
           </p>
         )}
 
-        {/* Success Message */}
-        {link && isValidDriveLink(link) && !hasError && (
+        {/* Source Detected */}
+        {sourceLabel && !hasError && (
           <p className="text-green-400 text-xs flex items-center gap-1.5">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
-            Valid Google Drive link detected
+            {sourceLabel} detected
           </p>
         )}
+      </div>
+
+      {/* Supported Sources */}
+      <div className="flex flex-wrap gap-2">
+        {['Google Drive', 'Dropbox', 'OneDrive', 'MediaFire', 'Direct URL'].map((source) => (
+          <span
+            key={source}
+            className="px-2.5 py-1 rounded-full text-xs font-medium bg-white/5 border border-white/10 text-gray-500"
+          >
+            {source}
+          </span>
+        ))}
       </div>
 
       {/* Submit Button */}
@@ -130,8 +152,7 @@ const UploadForm = ({ onSubmit, loading }) => {
 
       {/* Helper Text */}
       <p className="text-center text-gray-600 text-xs">
-        Make sure your Google Drive file is set to{' '}
-        <span className="text-violet-400 font-medium">"Anyone with the link"</span>
+        Supports Google Drive, Dropbox, OneDrive, MediaFire and any direct download link
       </p>
     </form>
   )
